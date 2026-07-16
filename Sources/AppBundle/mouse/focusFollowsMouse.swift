@@ -43,16 +43,7 @@ import AppKit
                 window = location.findWindowRecursively(in: workspace.rootTilingContainer, virtual: false, fullscreenCoversAll: true)
             }
             if let window {
-                // Don't steal focus from a floating window when the cursor moves
-                // to a tiling window. This prevents floating windows from
-                // "disappearing" (going behind tiling windows) when the cursor
-                // leaves the floating window's bounds.
-                // NOTE: CGSSetWindowLevel (private API) could set other apps'
-                // windows to always-on-top, but WindowServer rejects it for
-                // windows not owned by the calling process.
-                if !window.isFloating, let focusedWindow = focus.windowOrNil, focusedWindow.isFloating {
-                    return
-                }
+
                 try await runLightSession(.focusFollowsMouse, token) {
                     _ = window.focusWindow()
                     window.nativeFocus()

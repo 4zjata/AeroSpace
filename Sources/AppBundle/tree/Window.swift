@@ -67,5 +67,15 @@ extension Window {
         bind(to: workspace.floatingWindowsContainer, adaptiveWeight: WEIGHT_AUTO, index: INDEX_BIND_LAST)
     }
 
+    func updateWindowLevelBasedOnParent() {
+        switch windowParentCases {
+            case .floatingWindowsContainer:
+                setWindowLevelViaSA(windowId: windowId, levelKey: 2)
+            default:
+                setWindowLevelViaSA(windowId: windowId, levelKey: 0)
+        }
+    }
+
     func asMacWindow() -> MacWindow { self as! MacWindow }
 }
+
