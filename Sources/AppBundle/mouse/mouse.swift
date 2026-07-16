@@ -13,3 +13,13 @@ func isManipulatedWithMouse(_ window: Window) async throws -> Bool {
 
 /// Same motivation as in monitorFrameNormalized
 var mouseLocation: CGPoint { NSEvent.mouseLocation.withYAxisFlipped }
+
+func warpMouseCursor(to point: CGPoint) {
+    let event = CGEvent(
+        mouseEventSource: nil,
+        mouseType: .mouseMoved,
+        mouseCursorPosition: point,
+        mouseButton: .left
+    )
+    event?.post(tap: .cghidEventTap)
+}

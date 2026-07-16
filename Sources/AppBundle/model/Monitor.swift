@@ -1,7 +1,7 @@
 import AppKit
 import Common
 
-private struct MonitorImpl {
+struct MonitorImpl {
     let monitorAppKitNsScreenScreensId: Int
     let name: String
     let rect: Rect
@@ -86,7 +86,7 @@ extension NSScreen {
 }
 
 private let testMonitorRect = Rect(topLeftX: 0, topLeftY: 0, width: 1920, height: 1080)
-private let testMonitor = MonitorImpl(
+let testMonitor = MonitorImpl(
     monitorAppKitNsScreenScreensId: 1,
     name: "Test Monitor",
     rect: testMonitorRect,
@@ -94,8 +94,12 @@ private let testMonitor = MonitorImpl(
     isMain: true,
 )
 
+nonisolated(unsafe) var testMonitors: [Monitor] = [testMonitor]
+
 var mainMonitor: Monitor {
-    if isUnitTest { return testMonitor }
+    if isUnitTest {
+        return testMonitors.first(where: \.isMain) ?? testMonitors.first ?? testMonitor
+    }
     let screens = NSScreen.screens
     // Fallback: If main screen can't be found (e.g., during display reconfiguration),
     // return screens.first or testMonitor to avoid crash
@@ -106,7 +110,7 @@ var mainMonitor: Monitor {
 
 var monitors: [Monitor] {
     isUnitTest
-        ? [testMonitor]
+        ? testMonitors
         : NSScreen.screens.enumerated().map { $0.element.toMonitor(monitorAppKitNsScreenScreensId: $0.offset + 1) }
 }
 

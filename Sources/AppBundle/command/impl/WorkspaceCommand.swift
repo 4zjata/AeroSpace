@@ -34,7 +34,15 @@ struct WorkspaceCommand: Command {
                     .succ(io.err("Workspace '\(workspaceName)' is already focused. Tip: use --fail-if-noop to exit with non-zero code"))
             }
         } else {
-            return .from(bool: Workspace.get(byName: workspaceName).focusWorkspace())
+            let wsTarget = Workspace.get(byName: workspaceName)
+            if !wsTarget.isVisible && config.workspaceToMonitorForceAssignment[wsTarget.name] == nil {
+                let focusedMonitor = focusedWs.workspaceMonitor
+                let monitorTargetOriginal = wsTarget.workspaceMonitor
+                if focusedMonitor.setActiveWorkspace(wsTarget) {
+                    focusedWs.assignedMonitorPoint = monitorTargetOriginal.rect.topLeftCorner
+                }
+            }
+            return .from(bool: wsTarget.focusWorkspace())
         }
     }
 }

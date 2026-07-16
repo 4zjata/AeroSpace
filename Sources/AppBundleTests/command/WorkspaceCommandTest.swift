@@ -172,4 +172,124 @@ final class WorkspaceCommandTest: XCTestCase {
         assertEquals(result.exitCode.rawValue, 0)
         assertEquals(focus.workspace.name, "b")
     }
+
+    func testWorkspaceVisibleOnOtherMonitor_transfersFocusOnly() async {
+        let monitor1 = MonitorImpl(
+            monitorAppKitNsScreenScreensId: 1,
+            name: "monitor1",
+            rect: Rect(topLeftX: 0, topLeftY: 0, width: 1920, height: 1080),
+            visibleRect: Rect(topLeftX: 0, topLeftY: 0, width: 1920, height: 1080),
+            isMain: true
+        )
+        let monitor2 = MonitorImpl(
+            monitorAppKitNsScreenScreensId: 2,
+            name: "monitor2",
+            rect: Rect(topLeftX: 1920, topLeftY: 0, width: 1920, height: 1080),
+            visibleRect: Rect(topLeftX: 1920, topLeftY: 0, width: 1920, height: 1080),
+            isMain: false
+        )
+        testMonitors = [monitor1, monitor2]
+        gcMonitors()
+
+        let wsA = Workspace.get(byName: "a")
+        let wsB = Workspace.get(byName: "b")
+
+        assertTrue(monitor1.setActiveWorkspace(wsA))
+        assertTrue(monitor2.setActiveWorkspace(wsB))
+
+        assertTrue(wsA.focusWorkspace())
+        assertEquals(focus.workspace.name, "a")
+
+        let result = await parseCommand("workspace b").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        assertEquals(result.exitCode.rawValue, 0)
+        assertEquals(focus.workspace.name, "b")
+        assertEquals(monitor1.activeWorkspace.name, "a")
+        assertEquals(monitor2.activeWorkspace.name, "b")
+    }
+
+    func testWorkspaceInvisibleNoForcedAssignment_dynamicSwaps() async {
+        let monitor1 = MonitorImpl(
+            monitorAppKitNsScreenScreensId: 1,
+            name: "monitor1",
+            rect: Rect(topLeftX: 0, topLeftY: 0, width: 1920, height: 1080),
+            visibleRect: Rect(topLeftX: 0, topLeftY: 0, width: 1920, height: 1080),
+            isMain: true
+        )
+        let monitor2 = MonitorImpl(
+            monitorAppKitNsScreenScreensId: 2,
+            name: "monitor2",
+            rect: Rect(topLeftX: 1920, topLeftY: 0, width: 1920, height: 1080),
+            visibleRect: Rect(topLeftX: 1920, topLeftY: 0, width: 1920, height: 1080),
+            isMain: false
+        )
+        testMonitors = [monitor1, monitor2]
+        gcMonitors()
+
+        let wsA = Workspace.get(byName: "a")
+        let wsB = Workspace.get(byName: "b")
+        let wsC = Workspace.get(byName: "c")
+
+        assertTrue(monitor1.setActiveWorkspace(wsA))
+        assertTrue(monitor2.setActiveWorkspace(wsB))
+
+        // C is invisible and originally on monitor2
+        wsC.assignedMonitorPoint = monitor2.rect.topLeftCorner
+
+        assertTrue(wsA.focusWorkspace())
+        assertEquals(focus.workspace.name, "a")
+
+        let result = await parseCommand("workspace c").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        assertEquals(result.exitCode.rawValue, 0)
+        assertEquals(focus.workspace.name, "c")
+        
+        // C should now be active/visible on monitor1 (replacing A)
+        assertEquals(monitor1.activeWorkspace.name, "c")
+        // A should now be invisible and swapped to monitor2 (where C came from)
+        assertFalse(wsA.isVisible)
+        assertEquals(wsA.workspaceMonitor.name, "monitor2")
+        // B should remain active/visible on monitor2
+        assertEquals(monitor2.activeWorkspace.name, "b")
+    }
+
+    func testWorkspaceInvisibleWithForcedAssignment_noDynamicSwap() async {
+        let monitor1 = MonitorImpl(
+            monitorAppKitNsScreenScreensId: 1,
+            name: "monitor1",
+            rect: Rect(topLeftX: 0, topLeftY: 0, width: 1920, height: 1080),
+            visibleRect: Rect(topLeftX: 0, topLeftY: 0, width: 1920, height: 1080),
+            isMain: true
+        )
+        let monitor2 = MonitorImpl(
+            monitorAppKitNsScreenScreensId: 2,
+            name: "monitor2",
+            rect: Rect(topLeftX: 1920, topLeftY: 0, width: 1920, height: 1080),
+            visibleRect: Rect(topLeftX: 1920, topLeftY: 0, width: 1920, height: 1080),
+            isMain: false
+        )
+        testMonitors = [monitor1, monitor2]
+        gcMonitors()
+
+        let wsA = Workspace.get(byName: "a")
+        let wsB = Workspace.get(byName: "b")
+        let wsC = Workspace.get(byName: "c")
+
+        assertTrue(monitor1.setActiveWorkspace(wsA))
+        assertTrue(monitor2.setActiveWorkspace(wsB))
+
+        // Force assign C to monitor2
+        config.workspaceToMonitorForceAssignment["c"] = [.sequenceNumber(2)]
+
+        assertTrue(wsA.focusWorkspace())
+        assertEquals(focus.workspace.name, "a")
+
+        let result = await parseCommand("workspace c").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        assertEquals(result.exitCode.rawValue, 0)
+        assertEquals(focus.workspace.name, "c")
+
+        // C should be active on monitor2 (because it's force assigned to monitor2)
+        assertEquals(monitor2.activeWorkspace.name, "c")
+        // A should remain active on monitor1 (no swap occurred)
+        assertEquals(monitor1.activeWorkspace.name, "a")
+        assertTrue(wsA.isVisible)
+    }
 }

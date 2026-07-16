@@ -86,6 +86,10 @@ extension CmdArgs {
                 command = TestCommand(args: self as! TestCmdArgs)
             case .testNot:
                 command = TestNotCommand(args: self as! TestNotCmdArgs)
+            case .toggleScratchpad:
+                command = ToggleScratchpadCommand(args: self as! ToggleScratchpadCmdArgs)
+            case .moveNodeToScratchpad:
+                command = MoveNodeToScratchpadCommand(args: self as! MoveNodeToScratchpadCmdArgs)
             case .triggerBinding:
                 command = TriggerBindingCommand(args: self as! TriggerBindingCmdArgs)
             case .volume:

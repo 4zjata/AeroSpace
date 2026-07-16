@@ -92,9 +92,9 @@ let list_windows_help_generated = """
        OR: list-windows [-h|--help] --focused [--format <output-format>] [--count] [--json]
     """
 let list_workspaces_help_generated = """
-    USAGE: list-workspaces [-h|--help] --monitor <monitor>... [--visible [no]] [--empty [no]] [--format <output-format>] [--count] [--json]
-       OR: list-workspaces [-h|--help] --all [--format <output-format>] [--count] [--json]
-       OR: list-workspaces [-h|--help] --focused [--format <output-format>] [--count] [--json]
+    USAGE: list-workspaces [-h|--help] --monitor <monitor>... [--visible [no]] [--empty [no]] [--format <output-format>] [--count] [--json] [--include-scratchpads]
+       OR: list-workspaces [-h|--help] --all [--format <output-format>] [--count] [--json] [--include-scratchpads]
+       OR: list-workspaces [-h|--help] --focused [--format <output-format>] [--count] [--json] [--include-scratchpads]
     """
 let macos_native_fullscreen_help_generated = """
     USAGE: macos-native-fullscreen [-h|--help] [--window-id <window-id>]
@@ -115,6 +115,9 @@ let move_node_to_monitor_help_generated = """
                                 [--wrap-around] (left|down|up|right|next|prev)
        OR: move-node-to-monitor [-h|--help] [--window-id <window-id>] [--focus-follows-window]
                                 [--fail-if-noop] [--] <monitor-pattern>...
+    """
+let move_node_to_scratchpad_help_generated = """
+    USAGE: move-node-to-scratchpad [-h|--help] [--scratchpad-id <name>]
     """
 let move_node_to_workspace_help_generated = """
     USAGE: move-node-to-workspace [-h|--help] [--focus-follows-window] [--wrap-around]
@@ -163,6 +166,9 @@ let test_not_help_generated = """
 let test_help_generated = """
     USAGE: test [-h|--help] <lhs> = <rhs>
        OR: test [-h|--help] <lhs> ~= <rhs>
+    """
+let toggle_scratchpad_help_generated = """
+    USAGE: toggle-scratchpad [-h|--help] [--scratchpad-id <name>]
     """
 let trigger_binding_help_generated = """
     USAGE: trigger-binding [-h|--help] --mode <mode-id> [--] <binding>

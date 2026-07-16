@@ -7,6 +7,9 @@ struct ListWorkspacesCommand: Command {
 
     func run(_ env: CmdEnv, _ io: CmdIo) -> BinaryExitCode {
         var result: [Workspace] = Workspace.all
+        if !args.includeScratchpads {
+            result = result.filter { !$0.isScratchpad }
+        }
         if let visible = args.filteringOptions.visible {
             result = result.filter { $0.isVisible == visible }
         }

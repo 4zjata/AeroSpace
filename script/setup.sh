@@ -4,8 +4,8 @@ set -u # Treat unset variables and parameters other than the special parameters 
 set -o pipefail # Any command failed in the pipe fails the whole pipe
 # set -x # Print shell commands as they are executed (or you can try -v which is less verbose)
 
-if ! grep -q '^5\.' <<< "$BASH_VERSION"; then
-    echo "Your bash version is too old. Version 5 is the minimum required version" > /dev/stderr
+if ! grep -q '^[345]\.' <<< "$BASH_VERSION"; then
+    echo "Your bash version is too old. Version 3, 4, or 5 is required." > /dev/stderr
     exit 1
 fi
 

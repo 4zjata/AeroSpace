@@ -1,0 +1,23 @@
+= aerospace-toggle-scratchpad(1)
+include::util/man-attributes.adoc[]
+// tag::purpose[]
+:manpurpose: Toggle scratchpad visibility on the focused monitor.
+// end::purpose[]
+:manname: aerospace-toggle-scratchpad
+
+// =========================================================== Synopsis
+== Synopsis
+[verse]
+// tag::synopsis[]
+aerospace toggle-scratchpad [-h|--help] [--scratchpad-id <name>]
+// end::synopsis[]
+
+// =========================================================== Description
+== Description
+// tag::body[]
+{manpurpose}
+
+If the scratchpad is currently visible on the focused monitor, it will be hidden.
+If it is visible on another monitor, it will be released from that monitor first, and then shown on the focused monitor.
+If it is invisible, it will be shown on the focused monitor.
+// end::body[]

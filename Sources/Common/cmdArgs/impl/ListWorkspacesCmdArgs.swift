@@ -22,6 +22,7 @@ public struct ListWorkspacesCmdArgs: CmdArgs {
             "--format": formatParser(\._format, for: .workspace),
             "--count": trueBoolFlag(\.outputOnlyCount),
             "--json": trueBoolFlag(\.json),
+            "--include-scratchpads": trueBoolFlag(\.includeScratchpads),
         ],
         posArgs: [],
         conflictingOptions: [
@@ -35,6 +36,7 @@ public struct ListWorkspacesCmdArgs: CmdArgs {
     fileprivate var focused: Bool = false // Alias
 
     public var filteringOptions = FilteringOptions()
+    public var includeScratchpads: Bool = false
     public var _format: [InterToken<InterVar>] = [.interVar(.formatVar(.workspace(.workspaceName)))]
     public var outputOnlyCount: Bool = false
     public var json: Bool = false

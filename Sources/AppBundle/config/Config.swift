@@ -61,10 +61,16 @@ struct Config: ConvenienceMutable {
     var modes: [String: Mode] = [:]
     var onWindowDetected: [WindowDetectedCallback] = []
     var onModeChanged: Shell<any Command> = .empty
+    var scratchpads: [String: ScratchpadConfig] = [:]
+    var workspaceSwipeScratchpad: String = "default"
 }
 
 struct FocusFollowsMouse: ConvenienceMutable {
-    var enabled: Bool = false
+    var enabled: Bool = true
+}
+
+struct ScratchpadConfig: ConvenienceMutable, Sendable {
+    var onCreatedEmpty: Shell<any Command> = .empty
 }
 
 enum ConfigVersion: Int, Comparable, CaseIterable, Sendable, CustomStringConvertible {

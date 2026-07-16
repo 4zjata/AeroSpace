@@ -34,7 +34,7 @@ final class Workspace: TreeNode, NonLeafTreeNodeObject, Hashable, Comparable {
     let name: String
     nonisolated private let nameLogicalSegments: StringLogicalSegments
     /// `assignedMonitorPoint` must be interpreted only when the workspace is invisible
-    fileprivate var assignedMonitorPoint: CGPoint? = nil
+    var assignedMonitorPoint: CGPoint? = nil
 
     @MainActor
     private init(_ name: String) {
@@ -55,6 +55,10 @@ final class Workspace: TreeNode, NonLeafTreeNodeObject, Hashable, Comparable {
             workspaceNameToWorkspace[name] = workspace
             return workspace
         }
+    }
+
+    @MainActor var isScratchpad: Bool {
+        name.hasPrefix("scratchpad_")
     }
 
     nonisolated static func < (lhs: Workspace, rhs: Workspace) -> Bool {

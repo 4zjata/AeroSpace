@@ -122,6 +122,7 @@ extension Workspace {
     if refreshSessionEvent?.isStartup == true {
         return
     }
+
     let focus = focus
     let frozenFocus = focus.frozen
     var hasFocusChanged = false
@@ -151,6 +152,15 @@ extension Workspace {
     }
     if hasFocusedMonitorChanged {
         _ = await onFocusedMonitorChanged(.defaultEnv, CmdIoImpl.emptyStdinIgnoringOut, focus)
+        if refreshSessionEvent?.isFocusFollowsMouse == false {
+            let center: CGPoint
+            if let window = focus.windowOrNil, let rect = window.lastAppliedLayoutPhysicalRect {
+                center = rect.center
+            } else {
+                center = focus.workspace.workspaceMonitor.rect.center
+            }
+            warpMouseCursor(to: center)
+        }
     }
 }
 

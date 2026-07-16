@@ -82,12 +82,21 @@ extension Window {
             var newX = workspaceRect.topLeftX + xProportion * workspaceRect.width
             var newY = workspaceRect.topLeftY + yProportion * workspaceRect.height
 
-            let windowWidth = windowRect.width
-            let windowHeight = windowRect.height
-            newX = newX.coerce(in: workspaceRect.minX ... max(workspaceRect.minX, workspaceRect.maxX - windowWidth))
-            newY = newY.coerce(in: workspaceRect.minY ... max(workspaceRect.minY, workspaceRect.maxY - windowHeight))
+            let newWidth: CGFloat
+            let newHeight: CGFloat
+            if workspace.isScratchpad {
+                let widthProportion = windowRect.width / currentMonitor.visibleRect.width
+                let heightProportion = windowRect.height / currentMonitor.visibleRect.height
+                newWidth = widthProportion * workspaceRect.width
+                newHeight = heightProportion * workspaceRect.height
+            } else {
+                newWidth = windowRect.width
+                newHeight = windowRect.height
+            }
+            newX = newX.coerce(in: workspaceRect.minX ... max(workspaceRect.minX, workspaceRect.maxX - newWidth))
+            newY = newY.coerce(in: workspaceRect.minY ... max(workspaceRect.minY, workspaceRect.maxY - newHeight))
 
-            setAxFrame(CGPoint(x: newX, y: newY), nil)
+            setAxFrame(CGPoint(x: newX, y: newY), CGSize(width: newWidth, height: newHeight))
         }
         if isFullscreen {
             layoutFullscreen(context)
