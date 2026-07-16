@@ -14,8 +14,9 @@ struct AeroSpaceApp: App {
     }
 
     var body: some Scene {
-        menuBar(viewModel: viewModel)
+        menuBar(viewModel: viewModel, openWindow: openWindow)
         getMessageWindow(messageModel: messageModel)
+        getConfigEditorWindow()
             .onChange(of: messageModel.message) { message in
                 if message != nil {
                     openWindow(id: messageWindowId)

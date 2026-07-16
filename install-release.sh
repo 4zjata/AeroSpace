@@ -15,6 +15,11 @@ echo "=== 3. Replacing system binaries ==="
 cp .build/x86_64-apple-macosx/release/aerospace /usr/local/bin/aerospace
 cp .build/x86_64-apple-macosx/release/AeroSpaceApp /Applications/AeroSpace.app/Contents/MacOS/AeroSpace
 
+echo "=== 3a. Installing Scripting Addition ==="
+mkdir -p /Applications/AeroSpace.app/Contents/Resources/
+clang -dynamiclib -framework Cocoa -framework CoreGraphics -O3 -o /Applications/AeroSpace.app/Contents/Resources/sa_payload.dylib Sources/sa/sa_payload.m
+clang -framework Cocoa -O3 -o /usr/local/bin/aerospace-sa-loader Sources/sa/sa_loader.m
+
 echo "=== 4. Re-signing App Bundle ==="
 codesign --force --deep --sign - /Applications/AeroSpace.app
 

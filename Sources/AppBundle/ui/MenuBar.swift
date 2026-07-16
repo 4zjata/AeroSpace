@@ -3,7 +3,7 @@ import Foundation
 import SwiftUI
 
 @MainActor
-public func menuBar(viewModel: TrayMenuModel) -> some Scene { // todo should it be converted to "SwiftUI struct"?
+public func menuBar(viewModel: TrayMenuModel, openWindow: OpenWindowAction) -> some Scene { // todo should it be converted to "SwiftUI struct"?
     MenuBarExtra {
         let shortIdentification = "\(aeroSpaceAppName) v\(aeroSpaceAppVersion) \(gitShortHash)"
         let identification      = "\(aeroSpaceAppName) v\(aeroSpaceAppVersion) \(gitHash)"
@@ -59,6 +59,9 @@ public func menuBar(viewModel: TrayMenuModel) -> some Scene { // todo should it 
             }.keyboardShortcut("E", modifiers: .command)
             getExperimentalUISettingsMenu(viewModel: viewModel)
             openConfigButton()
+            Button("Config Editor...") {
+                openWindow(id: configEditorWindowId)
+            }
             reloadConfigButton(warningsAsErrors: false)
         } else {
             Button("AeroSpace requires accessibility permission to move windows") {
