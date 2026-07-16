@@ -130,7 +130,7 @@ public struct ConfigEditorView: View {
                 return
         }
         
-        var ruleText = "\n[[on-window-detect]]\n"
+        var ruleText = "\n[[on-window-detected]]\n"
         if matchApp {
             ruleText += "if.app-id-regex-like = '\(window.appId)'\n"
         }
