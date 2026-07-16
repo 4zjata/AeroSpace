@@ -12,7 +12,7 @@ import Foundation
         if isDebug {
             await toggleReleaseServerIfDebug(.off)
             interceptTermination(SIGINT)
-            interceptTermination(SIGKILL)
+            interceptTermination(SIGTERM)
         }
 
         await bootstrapConfig_nonCancellable()
