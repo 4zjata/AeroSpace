@@ -31,6 +31,9 @@ import Foundation
         )
         try await runLightSession(.startup, .forceRun) {
             smartLayoutAtStartup()
+            if isDebug {
+                restoreDebugWindowStates()
+            }
             _ = await config.afterStartupCommand.run(.defaultEnv, .emptyStdin)
         }
     }
