@@ -11,7 +11,7 @@ kern_return_t (*_thread_convert_thread_state)(thread_act_t thread, int direction
 #endif
 
 // We write the payload to /tmp/sa_payload.dylib
-static char *payload_path = "/tmp/sa_payload.dylib";
+static char *payload_path = "/Applications/AeroSpace.app/Contents/Resources/sa_payload.dylib";
 
 static char shell_code[] =
 #ifdef __x86_64__
