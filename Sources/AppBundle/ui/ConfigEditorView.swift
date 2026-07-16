@@ -154,6 +154,16 @@ public struct ConfigEditorView: View {
                         _ = await reloadConfig_nonCancellable(args: args)
                     }
                 }
+                
+                Task { @MainActor in
+                    if let win = Window.get(byId: window.id) {
+                        let workspace = win.nodeWorkspace ?? focus.workspace
+                        win.bindAsFloatingWindow(to: workspace)
+                        if let size = win.lastFloatingSize {
+                            win.setAxFrame(nil, size)
+                        }
+                    }
+                }
             }
         } catch {
             statusMessage = "Failed to write to config: \(error.localizedDescription)"
