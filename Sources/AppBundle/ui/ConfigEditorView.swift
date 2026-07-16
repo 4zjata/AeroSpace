@@ -132,11 +132,11 @@ public struct ConfigEditorView: View {
         
         var ruleText = "\n[[on-window-detected]]\n"
         if matchApp {
-            ruleText += "if.app-id-regex-like = '\(window.appId)'\n"
+            ruleText += "if.app-id = '\(window.appId)'\n"
         }
         if matchTitle {
             let escapedPattern = titlePattern.replacingOccurrences(of: "'", with: "\\'")
-            ruleText += "if.window-title-regex-like = '\(escapedPattern)'\n"
+            ruleText += "if.window-title-regex-substring = '\(escapedPattern)'\n"
         }
         ruleText += "run = 'layout floating'\n"
         
