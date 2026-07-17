@@ -29,10 +29,10 @@ public func startTrackpadSwipeListener() {
             if let port = unsafe eventTapPort {
                 CGEvent.tapEnable(tap: port, enable: true)
             }
-            return Unmanaged.passUnretained(event)
+            return unsafe Unmanaged.passUnretained(event)
         }
         
-        guard type.rawValue == 29 else { return Unmanaged.passUnretained(event) }
+        guard type.rawValue == 29 else { return unsafe Unmanaged.passUnretained(event) }
         
         if let nsEvent = NSEvent(cgEvent: event) {
             let touches = nsEvent.allTouches()
@@ -43,7 +43,7 @@ public func startTrackpadSwipeListener() {
             }
         }
         
-        return Unmanaged.passUnretained(event)
+        return unsafe Unmanaged.passUnretained(event)
     }
     
     let handle = unsafe CGEvent.tapCreate(

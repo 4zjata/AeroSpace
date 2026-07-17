@@ -98,7 +98,7 @@ nonisolated(unsafe) var testMonitors: [Monitor] = [testMonitor]
 
 var mainMonitor: Monitor {
     if isUnitTest {
-        return testMonitors.first(where: \.isMain) ?? testMonitors.first ?? testMonitor
+        return (unsafe testMonitors).first(where: \.isMain) ?? (unsafe testMonitors).first ?? testMonitor
     }
     let screens = NSScreen.screens
     // Fallback: If main screen can't be found (e.g., during display reconfiguration),
@@ -110,7 +110,7 @@ var mainMonitor: Monitor {
 
 var monitors: [Monitor] {
     isUnitTest
-        ? testMonitors
+        ? (unsafe testMonitors)
         : NSScreen.screens.enumerated().map { $0.element.toMonitor(monitorAppKitNsScreenScreensId: $0.offset + 1) }
 }
 
