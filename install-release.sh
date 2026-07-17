@@ -35,7 +35,8 @@ while true; do
     sleep 5
 done
 EOF
-sudo chmod +x /usr/local/bin/aerospace-sa-helper.sh
+sudo chown root:wheel /usr/local/bin/aerospace-sa-helper.sh
+sudo chmod 755 /usr/local/bin/aerospace-sa-helper.sh
 
 sudo tee /Library/LaunchDaemons/bobko.aerospace.helper.plist > /dev/null << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -65,6 +66,11 @@ sudo chmod 644 /Library/LaunchDaemons/bobko.aerospace.helper.plist
 
 sudo launchctl unload /Library/LaunchDaemons/bobko.aerospace.helper.plist 2>/dev/null || true
 sudo launchctl load -w /Library/LaunchDaemons/bobko.aerospace.helper.plist
+
+# SA-05: Restrict log file permissions to owner and group read-only
+sudo touch /var/log/aerospace-helper.log
+sudo chown root:wheel /var/log/aerospace-helper.log
+sudo chmod 640 /var/log/aerospace-helper.log
 
 echo "=== 4. Re-signing App Bundle ==="
 codesign --force --deep --sign - /Applications/AeroSpace.app

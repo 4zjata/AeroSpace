@@ -45,7 +45,9 @@ public struct ConfigEditorView: View {
                         .font(.subheadline)
                         .bold()
                     
-                    Toggle("Match entire application (\(selected.appId))", isOn: $matchApp)
+                    Toggle(selected.appId.isEmpty
+                        ? "Match by app name (\(selected.appName)) — no bundle ID"
+                        : "Match entire application (\(selected.appId))", isOn: $matchApp)
                     
                     Toggle("Match specific window title", isOn: $matchTitle)
                         .onChange(of: matchTitle) { val in
@@ -132,11 +134,18 @@ public struct ConfigEditorView: View {
         
         var ruleText = "\n[[on-window-detected]]\n"
         if matchApp {
-            ruleText += "if.app-id = '\(window.appId)'\n"
+            if window.appId.isEmpty {
+                // Terminal-launched apps (e.g. mpv) have no bundle ID.
+                // Fall back to matching by app name using a regex.
+                let escapedName = escapeForTomlBasicString(window.appName)
+                ruleText += "if.app-name-regex-substring = \"^\(escapedName)$\"\n"
+            } else {
+                ruleText += "if.app-id = '\(window.appId)'\n"
+            }
         }
         if matchTitle {
-            let escapedPattern = titlePattern.replacingOccurrences(of: "'", with: "\\'")
-            ruleText += "if.window-title-regex-substring = '\(escapedPattern)'\n"
+            let escapedPattern = escapeForTomlBasicString(titlePattern)
+            ruleText += "if.window-title-regex-substring = \"\(escapedPattern)\"\n"
         }
         ruleText += "run = 'layout floating'\n"
         
@@ -187,4 +196,22 @@ public func getConfigEditorWindow() -> some Scene {
             }
     }
     .windowResizability(.contentSize)
+}
+
+/// Escape a string for use inside a TOML basic (double-quoted) string.
+/// TOML single-quoted strings do not support any escaping, so we must use
+/// double-quoted strings and escape \, ", and control characters.
+private func escapeForTomlBasicString(_ s: String) -> String {
+    var result = ""
+    for ch in s {
+        switch ch {
+            case "\\": result += "\\\\"
+            case "\"": result += "\\\""
+            case "\n": result += "\\n"
+            case "\r": result += "\\r"
+            case "\t": result += "\\t"
+            default: result.append(ch)
+        }
+    }
+    return result
 }

@@ -139,17 +139,20 @@ int main(int argc, char **argv)
 
     if (mach_vm_write(task, stack, (vm_address_t) &stack_contents, sizeof(uint64_t)) != KERN_SUCCESS) {
         fprintf(stderr, "could not copy dummy return address into stack segment\n");
-        return 1;
+        result = 1;
+        goto cleanup;
     }
 
     if (vm_protect(task, stack, stack_size, 1, VM_PROT_READ | VM_PROT_WRITE) != KERN_SUCCESS) {
         fprintf(stderr, "could not change protection for stack segment\n");
-        return 1;
+        result = 1;
+        goto cleanup;
     }
 
     if (mach_vm_allocate(task, &code, sizeof(shell_code), VM_FLAGS_ANYWHERE) != KERN_SUCCESS) {
         fprintf(stderr, "could not allocate code segment\n");
-        return 1;
+        result = 1;
+        goto cleanup;
     }
 
 #ifdef __x86_64__
@@ -170,12 +173,14 @@ int main(int argc, char **argv)
 
     if (mach_vm_write(task, code, (vm_address_t) shell_code, sizeof(shell_code)) != KERN_SUCCESS) {
         fprintf(stderr, "could not copy shellcode into code segment\n");
-        return 1;
+        result = 1;
+        goto cleanup;
     }
 
     if (vm_protect(task, code, sizeof(shell_code), 0, VM_PROT_EXECUTE | VM_PROT_READ) != KERN_SUCCESS) {
         fprintf(stderr, "could not change protection for code segment\n");
-        return 1;
+        result = 1;
+        goto cleanup;
     }
 
 #ifdef __x86_64__
@@ -189,7 +194,8 @@ int main(int argc, char **argv)
     kern_return_t error = thread_create_running(task, thread_flavor, (thread_state_t)&thread_state, thread_flavor_count, &thread);
     if (error != KERN_SUCCESS) {
         fprintf(stderr, "could not spawn remote thread: %s\n", mach_error_string(error));
-        return 1;
+        result = 1;
+        goto cleanup;
     }
 #elif __arm64__
     void *handle = dlopen("/usr/lib/system/libsystem_kernel.dylib", RTLD_GLOBAL | RTLD_LAZY);
@@ -200,7 +206,8 @@ int main(int argc, char **argv)
 
     if (!_thread_convert_thread_state) {
         fprintf(stderr, "could not load symbol: thread_convert_thread_state\n");
-        return 1;
+        result = 1;
+        goto cleanup;
     }
 
     arm_thread_state64_t thread_state = {}, machine_thread_state = {};
@@ -213,13 +220,15 @@ int main(int argc, char **argv)
     kern_return_t error = thread_create(task, &thread);
     if (error != KERN_SUCCESS) {
         fprintf(stderr, "could not create remote thread: %s\n", mach_error_string(error));
-        return 1;
+        result = 1;
+        goto cleanup;
     }
 
     error = _thread_convert_thread_state(thread, 2, thread_flavor, (thread_state_t) &thread_state, thread_flavor_count, (thread_state_t) &machine_thread_state, &machine_thread_flavor_count);
     if (error != KERN_SUCCESS) {
         fprintf(stderr, "could not convert thread state: %s\n", mach_error_string(error));
-        return 1;
+        result = 1;
+        goto cleanup;
     }
 
     NSOperatingSystemVersion os_version = [[NSProcessInfo processInfo] operatingSystemVersion];
@@ -229,19 +238,22 @@ int main(int argc, char **argv)
         error = thread_create_running(task, thread_flavor, (thread_state_t)&machine_thread_state, machine_thread_flavor_count, &thread);
         if (error != KERN_SUCCESS) {
             fprintf(stderr, "could not spawn remote thread: %s\n", mach_error_string(error));
-            return 1;
+            result = 1;
+            goto cleanup;
         }
     } else {
         error = thread_set_state(thread, thread_flavor, (thread_state_t)&machine_thread_state, machine_thread_flavor_count);
         if (error != KERN_SUCCESS) {
             fprintf(stderr, "could not set thread state: %s\n", mach_error_string(error));
-            return 1;
+            result = 1;
+            goto cleanup;
         }
 
         error = thread_resume(thread);
         if (error != KERN_SUCCESS) {
             fprintf(stderr, "could not resume remote thread: %s\n", mach_error_string(error));
-            return 1;
+            result = 1;
+            goto cleanup;
         }
     }
 #endif
@@ -270,6 +282,13 @@ terminate:
     error = thread_terminate(thread);
     if (error != KERN_SUCCESS) {
         fprintf(stderr, "failed to terminate remote thread: %s\n", mach_error_string(error));
+    }
+
+cleanup:
+    // SA-09: Deallocate injected memory on failure to prevent leaks in Dock
+    if (result != 0) {
+        if (code) mach_vm_deallocate(task, code, sizeof(shell_code));
+        if (stack) mach_vm_deallocate(task, stack, stack_size);
     }
 
     if (result == 0) {

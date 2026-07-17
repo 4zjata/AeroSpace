@@ -35,7 +35,7 @@ public func saveDebugWindowStates() {
     let titlesMap = getWindowTitlesMap()
     var saved: [SavedWindowState] = []
     
-    let path = "/tmp/aerospace-debug-layout.json"
+    let path = debugLayoutFilePath()
     
     for window in MacWindow.allWindowsMap.values {
         guard let appId = window.app.rawAppBundleId else { continue }
@@ -65,7 +65,7 @@ public func saveDebugWindowStates() {
 
 @MainActor
 public func restoreDebugWindowStates() {
-    let path = "/tmp/aerospace-debug-layout.json"
+    let path = debugLayoutFilePath()
     guard let data = try? Data(contentsOf: URL(filePath: path)),
           let saved = try? JSONDecoder().decode([SavedWindowState].self, from: data),
           !saved.isEmpty else {
@@ -98,4 +98,12 @@ public func restoreDebugWindowStates() {
             print("[aerospace-debug] Restored \(window.app.name ?? "App") as TILING on workspace \(state.workspace)")
         }
     }
+}
+
+// SA-07: Use a user-private directory instead of world-writable /tmp/
+private func debugLayoutFilePath() -> String {
+    let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        .appendingPathComponent("AeroSpace")
+    try? FileManager.default.createDirectory(at: appSupport, withIntermediateDirectories: true)
+    return appSupport.appendingPathComponent("debug-layout.json").path
 }
