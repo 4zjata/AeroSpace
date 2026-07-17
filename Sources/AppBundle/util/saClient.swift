@@ -22,7 +22,7 @@ func setWindowLevelViaSA(windowId: UInt32, levelKey: Int32) {
     let pathBytes = socketPath.utf8CString
     let pathLen = min(pathBytes.count, 104)
     _ = unsafe withUnsafeMutablePointer(to: &addr.sun_path) { sunPathPointer in
-        let rawPointer = unsafe UnsafeMutableRawPointer(sunPathPointer)
+        let rawPointer = UnsafeMutableRawPointer(sunPathPointer)
         let destination = unsafe rawPointer.assumingMemoryBound(to: CChar.self)
         for i in 0..<pathLen {
             unsafe destination[i] = pathBytes[i]
