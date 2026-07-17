@@ -99,7 +99,6 @@ open class TreeNode: Equatable, AeroAny {
         return result
     }
 
-    @MainActor
     private func unbindIfBound() -> BindingData? {
         guard let _parent else { return nil }
 
@@ -125,7 +124,6 @@ open class TreeNode: Equatable, AeroAny {
 
     var mruChildren: MruStack<TreeNode> { _mruChildren }
 
-    @MainActor
     @discardableResult
     func unbindFromParent() -> BindingData {
         unbindIfBound() ?? dieT("\(self) is already unbound. The stacktrace where it was unbound:\n\(unboundStacktrace.prettyDescription)")
