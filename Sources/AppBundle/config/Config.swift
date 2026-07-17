@@ -63,6 +63,9 @@ struct Config: ConvenienceMutable {
     var onModeChanged: Shell<any Command> = .empty
     var scratchpads: [String: ScratchpadConfig] = [:]
     var workspaceSwipeScratchpad: String = "default"
+    var enableTrackpadGestures: Bool = true
+    var enableAlwaysOnTop: Bool = true
+    var enableMouseFollowsFocus: Bool = true
 }
 
 struct FocusFollowsMouse: ConvenienceMutable {

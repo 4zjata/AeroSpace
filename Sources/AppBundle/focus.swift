@@ -152,7 +152,7 @@ extension Workspace {
     }
     if hasFocusedMonitorChanged {
         _ = await onFocusedMonitorChanged(.defaultEnv, CmdIoImpl.emptyStdinIgnoringOut, focus)
-        if refreshSessionEvent?.isFocusFollowsMouse == false {
+        if config.enableMouseFollowsFocus && refreshSessionEvent?.isFocusFollowsMouse == false {
             let center: CGPoint
             if let window = focus.windowOrNil, let rect = window.lastAppliedLayoutPhysicalRect {
                 center = rect.center

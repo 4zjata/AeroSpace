@@ -159,6 +159,9 @@ private let configParser: [String: any ParserProtocol<Config>] = [
     "on-window-detected": Parser(\.onWindowDetected, parseOnWindowDetectedArray),
     "scratchpad": Parser(\.scratchpads, parseScratchpads),
     "workspace-swipe-scratchpad": Parser(\.workspaceSwipeScratchpad, parseString),
+    "enable-trackpad-gestures": Parser(\.enableTrackpadGestures, parseBool),
+    "enable-always-on-top": Parser(\.enableAlwaysOnTop, parseBool),
+    "enable-mouse-follows-focus": Parser(\.enableMouseFollowsFocus, parseBool),
 
     // Deprecated
     "non-empty-workspaces-root-containers-layout-on-startup": Parser(\._nonEmptyWorkspacesRootContainersLayoutOnStartup, parseStartupRootContainerLayout),

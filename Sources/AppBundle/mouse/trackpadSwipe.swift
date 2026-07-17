@@ -86,6 +86,7 @@ private var gestureState = GestureState()
 
 @MainActor
 private func processSwipeTouches(_ touches: Set<NSTouch>) {
+    guard config.enableTrackpadGestures else { return }
     let activeTouches = touches.filter { touch in
         touch.phase == .began || touch.phase == .moved || touch.phase == .stationary
     }

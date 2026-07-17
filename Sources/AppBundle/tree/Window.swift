@@ -67,10 +67,15 @@ extension Window {
         bind(to: workspace.floatingWindowsContainer, adaptiveWeight: WEIGHT_AUTO, index: INDEX_BIND_LAST)
     }
 
+    @MainActor
     func updateWindowLevelBasedOnParent() {
         switch windowParentCases {
             case .floatingWindowsContainer:
-                setWindowLevelViaSA(windowId: windowId, levelKey: 2)
+                if config.enableAlwaysOnTop {
+                    setWindowLevelViaSA(windowId: windowId, levelKey: 2)
+                } else {
+                    setWindowLevelViaSA(windowId: windowId, levelKey: 0)
+                }
             default:
                 setWindowLevelViaSA(windowId: windowId, levelKey: 0)
         }
