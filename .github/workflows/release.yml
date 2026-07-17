@@ -1,0 +1,38 @@
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. v1.0.0-fork)'
+        required: true
+        default: 'v1.0.0-fork'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build and Release
+    runs-on: macos-15
+    steps:
+      - run: env # Debug
+      - uses: actions/checkout@v6
+      - run: ./.github/gh-actions-runner-xcode-select.sh
+      - run: brew install bash fish xcbeautify swiftly
+      - run: swiftly init --skip-install --assume-yes --verbose && swiftly install
+      - run: swiftly run swift --version
+      - name: './build-release.sh'
+        run: |
+          # "-" means "Sign to run locally".
+          ./build-release.sh --codesign-identity - --build-version "${{ github.event.inputs.version }}"
+      - name: 'Create GitHub Release'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version="${{ github.event.inputs.version }}"
+          gh release create "$version" \
+            .release/AeroSpace-v*-SIP-Enabled.zip \
+            .release/AeroSpace-v*-SIP-Disabled.zip \
+            --title "AeroSpace Fork Release $version" \
+            --notes "Custom build of AeroSpace with universal binaries and standalone installers for M2 Macbooks with SIP-Enabled and SIP-Disabled environments."
