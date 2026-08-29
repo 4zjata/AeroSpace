@@ -1,5 +1,12 @@
 # AeroSpace Beta [![Build](https://github.com/nikitabobko/AeroSpace/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/nikitabobko/AeroSpace/actions/workflows/build.yml)
 
+> [!IMPORTANT]
+> **Archived Repository / Personal Fork**
+> 
+> This repository is a personal fork of [AeroSpace](https://github.com/nikitabobko/AeroSpace) with various custom changes to make it behave closer to [Hyprland](https://hyprland.org/).
+> 
+> This project is now **archived** and unmaintained because the author has moved to Linux.
+
 <img src="./resources/Assets.xcassets/AppIcon.appiconset/icon.png" width="40%" align="right">
 
 AeroSpace is an i3-like tiling window manager for macOS
